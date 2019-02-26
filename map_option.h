@@ -12,9 +12,8 @@ void mkmap(std::vector<std::vector<int>> &map,int n)
 	{
 		for(int y=0;y!=n;y++)
 		{
-			srand((int)time(0)+rand());
-			double r=rdm(99);
-			if(r>0.8)
+			double r=rdm(99,1);
+			if(r>0.87)
 				map[x][y]=1;
 			else
 				map[x][y]=0;

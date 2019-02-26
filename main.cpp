@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <thread>
+#include <ctime>
+#include "mltrd.h"
 #include "othertools.h"
 #include "map_option.h"
 #include "ptl_option.h"
@@ -11,11 +14,11 @@ int main()
 	int n,Gmax,e1,e2,num;
 	double w;
 //*******以下内容是相关参数
-	n=7;//栅格维度
-	Gmax=100;//最大迭代
+	n=12;//栅格维度
+	Gmax=10000;//最大迭代
 	e1=2;//加速度参量
 	e2=2;
-	num=50;//例子数
+	num=20;//粒子数
 	w=1;//不要改
 //×××××××以下内容不要修改
 	cout<<"粒子数为"<<num<<endl;
@@ -30,6 +33,13 @@ int main()
 	mkmap(map,n);
 	shwmap(map,n);
 	cout<<endl;
+	//**************以下开始运算****************
+	vector<vector<int>> tmap=map;
+	clock_t start,ends;
+	start=clock();
+	//**************计时器就绪***************
+
+
 	ptl gbest;
 	gbest.map=map;
 	gbest.spini(n);
@@ -40,17 +50,23 @@ int main()
 		vptl.push_back(gbest);
 	}
 
-	for(int i=0;i<num;i++) {
-		vptl[i].ini(n);
-	}
+	//for(int i=0;i<num;i++) {
+	//	vptl[i].ini(n);
+	//}
+	Dprt0(vptl, n);
 
 	for(int gen=0;gen<Gmax;gen++) {
 		cout<<"第 "<<gen<<" 代,gbest适应度为"<<gbest.fit(gbest.p, n)<<endl;
 		for (int i = 0; i < num; i++) {
-			if (vptl[i].fit(vptl[i].p, n) <= gbest.fit(gbest.p, n))
+			double v=vptl[i].fit(vptl[i].p, n);
+			double g=gbest.fit(gbest.p, n);
+			bool b;
+			b=(v<=g);
+			if (b==1)
 				gbest.p = vptl[i].p;
-			vptl[i].update(e1,e2,n,w,gbest.p);
+			//vptl[i].update(e1,e2,n,w,gbest.p);
 		}
+		update0(vptl,e1,e2,n,w,gbest.p);
 		fw(Gmax,gen,w);
 	}
 	for(int i=0;i<n;i++)
@@ -58,5 +74,8 @@ int main()
 		map[i][gbest.p[i]]=-1;
 	}
 	shwmap(map,n);
+	//*************运算结束************
+	ends=clock();
+	cout<<"共用时： "<<(ends-start)/1000<<" 毫秒"<<endl;
 	return 0;
 }
